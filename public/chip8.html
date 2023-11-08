@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chip8 Emu</title>
+    <link rel="stylesheet" href="static/style.css" />
+</head>
+<body>
+    <section class="flex-section">
+        <div>
+            <select name="rom" id="rom">
+                <option disabled selected>Select Game...</option>
+                <option value="INVADERS">Invaders</option>
+                <option value="CONNECT4">Connect 4</option>
+                <option value="LANDING">Landing</option>
+                <option value="MAZE">Maze</option>
+                <option value="PONG">Pong</option>
+                <option value="SPACE">Space</option>
+                <option value="TANK">Tank</option>
+                <option value="TETRIS">Tetris</option>
+                <option value="TICTACTOE">Tic Tac Toe</option>
+                <option value="WALL">Wall</option>
+                <option value="BLINKY">Blinky</option>
+                <option value="TEST_OPCODES">Test ROM</option>
+            </select>
+        </div>
+    </section>
+
+    <section class="flex-section">
+        <canvas width="120" height="120" id="canvas"></canvas>
+    </section>
+
+    <section class="flex-section">
+        <div>
+            <label>Clock Rate:</label>
+            <input id="clock-rate" type="number" min="1" value="300">Hz
+        </div>
+    </section>
+    
+    <section>
+        <h3>Controls</h3>
+        <p>1 | 2 | 3 | 4</p>
+        <p>Q | W | E | R</p>
+        <p>A | S | D | F</p>
+        <p>Z | X | C | V</p>
+    </section>
+
+    <section>
+        <p>Created by: <a href="https://github.com/mnamie/rustychip">@mnamie</a></p>
+        <p>Learn more about the <a href="https://en.wikipedia.org/wiki/CHIP-8">CHIP-8 VM</a></p>
+        <p>Source on <a href="https://github.com/mnamie/rustychip">GitHub</a></p>
+    </section>
+    
+    <script type="module" src="index.js"></script>
+</body>
+</html>
