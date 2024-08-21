@@ -1,38 +1,22 @@
+mod draw;
+mod keyboard;
+
 use rustychip_core::*;
+use draw::draw_screen;
+use keyboard::handle_keypress;
 
 use std::env;
 use std::fs::File;
 use std::io::Read;
+use std::time::Duration;
 
 use sdl2::event::Event;
-use sdl2::pixels::Color;
-use sdl2::rect::Rect;
-use sdl2::render::Canvas;
-use sdl2::video::Window;
+
 
 const SCALE: u32 = 15;
 const WINDOW_WIDTH: u32 = (SCREEN_WIDTH as u32) * SCALE;
 const WINDOW_HEIGHT: u32 = (SCREEN_HEIGHT as u32) * SCALE;
 
-fn draw_screen(emulator: &RustyChip, canvas: &mut Canvas<Window>) {
-    canvas.set_draw_color(Color::RGB(0,0,0));
-    canvas.clear();
-
-    let screen_buffer = emulator.frontend_display();
-    
-    canvas.set_draw_color(Color::RGB(255, 255, 255));
-
-    for (i, pixel) in screen_buffer.iter().enumerate() {
-        if *pixel {
-            let x = (i % SCREEN_WIDTH) as u32;
-            let y = (i / SCREEN_WIDTH) as u32;
-
-            let rect = Rect::new((x * SCALE) as i32, (y * SCALE) as i32, SCALE, SCALE);
-            canvas.fill_rect(rect).unwrap();
-        }
-    }
-    canvas.present();
-}
 
 fn main() {
     let args: Vec<_> = env::args().collect();
@@ -67,6 +51,12 @@ fn main() {
     'gameloop: loop {
         for evt in event_pump.poll_iter() {
             match evt {
+                Event::KeyDown{keycode: Some(keycode), ..} => {
+                    handle_keypress(&mut emulator,&keycode, true);
+                },
+                Event::KeyUp{keycode: Some(keycode), ..} => {
+                    handle_keypress(&mut emulator, &keycode, false);
+                },
                 Event::Quit{..} => {
                     break 'gameloop;
                 },
@@ -74,7 +64,10 @@ fn main() {
             }
         }
 
-        emulator.cycle();
+        emulator.cycle(true);
+
         draw_screen(&emulator, &mut canvas);
+
+        std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 60));
     }
 }

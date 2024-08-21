@@ -48,21 +48,21 @@ async function run() {
 
         emulator.load_rom(romBuffer);
         
-        while (true) {
-            requestAnimationFrame(mainloop(emulator));
-        }
+        mainloop(emulator);
     }, false);
 }
 
 function mainloop(emulator) {
-    emulator.cycle();
-    emulator.tick_timers();
+    window.setInterval(() => {
+        emulator.cycle();
+        emulator.tick_timers();
 
-    ctx.fillStyle = "black";
-    ctx.fillRect(0, 0, WIDTH * SCALE, HEIGHT * SCALE);
+        ctx.fillStyle = "black";
+        ctx.fillRect(0, 0, WIDTH * SCALE, HEIGHT * SCALE);
 
-    ctx.fillStyle = "green";
-    emulator.draw(SCALE);
+        ctx.fillStyle = "green";
+        emulator.draw(SCALE);
+    }, 1000 / CLOCK_SPEED);   
 }
 
 run().catch(console.error);

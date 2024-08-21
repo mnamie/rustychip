@@ -38,7 +38,7 @@ impl RustyChipWasm {
 
     #[wasm_bindgen]
     pub fn cycle(&mut self) {
-        self.emulator.cycle();
+        self.emulator.cycle(false);
     }
 
     #[wasm_bindgen]

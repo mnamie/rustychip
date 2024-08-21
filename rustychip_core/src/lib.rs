@@ -85,8 +85,11 @@ impl RustyChip {
     }
 
     // Run a CPU cycle
-    pub fn cycle(&mut self) {
+    pub fn cycle(&mut self, debug: bool) {
         let op = self.fetch_opcode();
+        if debug {
+            println!("0x{:02x} 0x{:02x} {:?}", self.pc, op, self.keys)
+        }
         self.interpret(op);
     }
 
