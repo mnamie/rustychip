@@ -3,9 +3,16 @@ import init, * as wasm from "./wasm.js";
 const WIDTH = 64;
 const HEIGHT = 32;
 const SCALE = 15;
-let CLOCK_SPEED = 500;
 
-let anim_frame = 0;
+class Chip8Wrapper {
+    constructor() {
+        this.anim_frame = 0;
+        this.system = new wasm.RustyChipWasm();
+        this.clock_speed = 1.0 / 100.0 * 1000;
+        this.previousTime = 0.0;
+        this.deltaTime = 0.0;
+    }
+}
 
 const canvas = document.getElementById("canvas");
 canvas.width = WIDTH * SCALE;
@@ -20,25 +27,23 @@ const input = document.getElementById("rom");
 async function run() {
     await init();
 
-    let emulator = new wasm.RustyChipWasm();
+    let emulator = new Chip8Wrapper();
 
-    document.addEventListener("keydown", function(evt) {
-        emulator.keypress(evt, true);
+    document.addEventListener("keydown",  async function(evt) {
+        emulator.system.keypress(evt, true);
     });
 
-    document.addEventListener("keyup", function(evt) {
-        emulator.keypress(evt, false);
+    document.addEventListener("keyup",  async function(evt) {
+        emulator.system.keypress(evt, false);
     });
 
-    document.getElementById("clock-rate").addEventListener("change", function(e) {
-        console.log("Changing clock speed");
-        CLOCK_SPEED = parseInt( e.target.value );
-        console.log(`Clock speed is now: ${CLOCK_SPEED}`);
+    document.getElementById("clock-rate").addEventListener("change",  async function(e) {
+        emulator.clock_speed = 1.0 / parseFloat( e.target.value ) * 1000.0;
     });
 
     input.addEventListener("change", async function(evt) {
-        if (anim_frame != 0) {
-            window.cancelAnimationFrame(anim_frame);
+        if (emulator.anim_frame != 0) {
+            window.cancelAnimationFrame(emulator.anim_frame);
         }
 
         let file_name = evt.target.value;
@@ -46,23 +51,31 @@ async function run() {
         const arrayBuffer = await response.arrayBuffer();
         const romBuffer = new Uint8Array(arrayBuffer);
 
-        emulator.load_rom(romBuffer);
+        emulator.system.load_rom(romBuffer);
         
-        mainloop(emulator);
+        requestAnimationFrame((time) => mainloop(emulator, time));
     }, false);
 }
 
-function mainloop(emulator) {
-    window.setInterval(() => {
-        emulator.cycle();
-        emulator.tick_timers();
+function mainloop(emulator, time) {
+    const dt = time - emulator.previousTime;
+    emulator.deltaTime = emulator.deltaTime + dt;
+    emulator.previousTime = time;
 
-        ctx.fillStyle = "black";
-        ctx.fillRect(0, 0, WIDTH * SCALE, HEIGHT * SCALE);
+    console.log(`${dt}`);
 
-        ctx.fillStyle = "green";
-        emulator.draw(SCALE);
-    }, 1000 / CLOCK_SPEED);   
+    while (emulator.deltaTime > emulator.clock_speed) {
+        emulator.system.cycle();
+        emulator.system.tick_timers();
+        emulator.deltaTime = emulator.deltaTime - emulator.clock_speed;
+    }
+
+    ctx.fillStyle = "black";
+    ctx.fillRect(0, 0, WIDTH * SCALE, HEIGHT * SCALE);
+    ctx.fillStyle = "green";
+    emulator.system.draw(SCALE);
+
+    requestAnimationFrame((time) => mainloop(emulator, time));
 }
 
 run().catch(console.error);
