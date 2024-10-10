@@ -1,4 +1,4 @@
-# RustyChip: A CHIP-8 emulator in rust targeting WASM
+# RustyChip: A CHIP-8 emulator in Rust targeting WASM
 
 Following along with the [ebook from @aquova](https://github.com/aquova/chip8-book) to learn Rust with WASM.
 
