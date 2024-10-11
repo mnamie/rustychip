@@ -1,28 +1,8 @@
-import init, * as wasm from "./wasm.js";
+"use strict";
 
-const WIDTH = 64;
-const HEIGHT = 32;
-const SCALE = 15;
+import init from "./wasm.js";
+import Chip8Wrapper from "./wrapper.js";
 
-class Chip8Wrapper {
-    constructor() {
-        this.anim_frame = 0;
-        this.system = new wasm.RustyChipWasm();
-        this.clock_speed = 1.0 / 100.0 * 1000;
-        this.previousTime = 0.0;
-        this.deltaTime = 0.0;
-    }
-}
-
-const canvas = document.getElementById("canvas");
-canvas.width = WIDTH * SCALE;
-canvas.height = HEIGHT * SCALE;
-
-const ctx = canvas.getContext("2d");
-ctx.fillStyle = "black";
-ctx.fillRect(0, 0, WIDTH * SCALE, HEIGHT * SCALE);
-
-const input = document.getElementById("rom");
 
 async function run() {
     await init();
@@ -41,7 +21,7 @@ async function run() {
         emulator.clock_speed = 1.0 / parseFloat( e.target.value ) * 1000.0;
     });
 
-    input.addEventListener("change", async function(evt) {
+    document.getElementById("rom").addEventListener("change", async function(evt) {
         if (emulator.anim_frame != 0) {
             window.cancelAnimationFrame(emulator.anim_frame);
         }
@@ -53,29 +33,8 @@ async function run() {
 
         emulator.system.load_rom(romBuffer);
         
-        requestAnimationFrame((time) => mainloop(emulator, time));
-    }, false);
-}
-
-function mainloop(emulator, time) {
-    const dt = time - emulator.previousTime;
-    emulator.deltaTime = emulator.deltaTime + dt;
-    emulator.previousTime = time;
-
-    console.log(`${dt}`);
-
-    while (emulator.deltaTime > emulator.clock_speed) {
-        emulator.system.cycle();
-        emulator.system.tick_timers();
-        emulator.deltaTime = emulator.deltaTime - emulator.clock_speed;
-    }
-
-    ctx.fillStyle = "black";
-    ctx.fillRect(0, 0, WIDTH * SCALE, HEIGHT * SCALE);
-    ctx.fillStyle = "green";
-    emulator.system.draw(SCALE);
-
-    requestAnimationFrame((time) => mainloop(emulator, time));
+        requestAnimationFrame((time) => emulator.mainloop(time));
+    });
 }
 
 run().catch(console.error);
