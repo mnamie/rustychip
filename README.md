@@ -12,4 +12,5 @@ Following along with the [ebook from @aquova](https://github.com/aquova/chip8-bo
 
 # Building Native Frontend:
 
-1. Good 'ole `cargo run --release -- path/to/rom integer_clock_speed` (`cargo run --release -- ./roms/CONNECT4 250` for example)
+1. Good 'ole `cargo build --release`
+2. Run executable --help for command line options
