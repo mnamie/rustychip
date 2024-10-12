@@ -23,7 +23,7 @@ const FONTSET: [u8; FONTSET_SIZE] = [
     0xF0, 0x80, 0x80, 0x80, 0xF0, // C
     0xE0, 0x90, 0x90, 0x90, 0xE0, // D
     0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
-    0xF0, 0x80, 0xF0, 0x80, 0x80 // F
+    0xF0, 0x80, 0xF0, 0x80, 0x80, // F
 ];
 
 pub struct RustyChip {
@@ -37,6 +37,12 @@ pub struct RustyChip {
     keys: [bool; 16],
     dt: u8,
     st: u8,
+}
+
+impl Default for RustyChip {
+    fn default() -> Self {
+        RustyChip::new()
+    }
 }
 
 impl RustyChip {
@@ -102,8 +108,8 @@ impl RustyChip {
     }
 
     pub fn load_rom(&mut self, data: &[u8]) {
-        let start = 0x200 as usize;
-        let end = (0x200 as usize) + data.len();
+        let start = 0x200;
+        let end = (0x200) + data.len();
         self.memory[start..end].copy_from_slice(data);
     }
 
@@ -124,31 +130,31 @@ impl RustyChip {
 
         match (hex1, hex2, hex3, hex4) {
             // 0000: NOP
-            (0, 0, 0, 0) => return,
+            (0, 0, 0, 0) => (),
 
             // 00E0: CLS (clear screen)
             (0, 0, 0xE, 0) => {
                 self.display = [false; SCREEN_SIZE];
-            },
+            }
 
             // 00EE: RET (return)
             (0, 0, 0xE, 0xE) => {
                 let return_address = self.pop();
                 self.pc = return_address;
-            },
+            }
 
             // 1NNN: JMP
             (1, _, _, _) => {
                 let nnn = op & 0xFFF;
                 self.pc = nnn;
-            },
+            }
 
             // 2NNN: CALL
             (2, _, _, _) => {
                 let nnn = op & 0xFFF;
                 self.push(self.pc);
                 self.pc = nnn;
-            },
+            }
 
             // 3XNN: SKP if VX == NN
             (3, _, _, _) => {
@@ -157,7 +163,7 @@ impl RustyChip {
                 if self.v[x] == nn {
                     self.pc += 2;
                 }
-            },
+            }
 
             // 4XNN: SKP if VX != NN
             (4, _, _, _) => {
@@ -166,7 +172,7 @@ impl RustyChip {
                 if self.v[x] != nn {
                     self.pc += 2;
                 }
-            },
+            }
 
             // 5XY0: SKP if VX == VY
             (5, _, _, 0) => {
@@ -175,71 +181,71 @@ impl RustyChip {
                 if self.v[x] == self.v[y] {
                     self.pc += 2;
                 }
-            },
+            }
 
             // 6XNN: VX = N
             (6, _, _, _) => {
                 let x = hex2 as usize;
                 let nn = (op & 0xFF) as u8;
                 self.v[x] = nn;
-            },
+            }
 
             // 7XNN: VX += NN
             (7, _, _, _) => {
                 let x = hex2 as usize;
                 let nn = (op & 0xFF) as u8;
                 self.v[x] = self.v[x].wrapping_add(nn);
-            },
+            }
 
             // 8XY0: VX = VY
             (8, _, _, 0) => {
                 let x = hex2 as usize;
                 let y = hex3 as usize;
                 self.v[x] = self.v[y];
-            },
+            }
 
             // 8XY1: Bitwise OR
             (8, _, _, 1) => {
                 let x = hex2 as usize;
                 let y = hex3 as usize;
                 self.v[x] |= self.v[y];
-            },
+            }
 
             // 8XY2: Bitwise AND
             (8, _, _, 2) => {
                 let x = hex2 as usize;
                 let y = hex3 as usize;
                 self.v[x] &= self.v[y];
-            },
+            }
 
             // 8XY3: Bitwise XOR
             (8, _, _, 3) => {
                 let x = hex2 as usize;
                 let y = hex3 as usize;
                 self.v[x] ^= self.v[y];
-            },
+            }
 
             // 8XY4: ADD w/ carry over flag
             (8, _, _, 4) => {
                 let x = hex2 as usize;
                 let y = hex3 as usize;
                 let (new_val, carry) = self.v[x].overflowing_add(self.v[y]);
-                let carry_flag = if carry {1} else {0};
-                
+                let carry_flag = if carry { 1 } else { 0 };
+
                 self.v[x] = new_val;
                 self.v[0xF] = carry_flag;
-            },
+            }
 
             // 8XY5: MINUS w/ underflow flag
             (8, _, _, 5) => {
                 let x = hex2 as usize;
                 let y = hex3 as usize;
                 let (new_val, under) = self.v[x].overflowing_sub(self.v[y]);
-                let under_flag = if under {0} else {1};
-                
+                let under_flag = if under { 0 } else { 1 };
+
                 self.v[x] = new_val;
                 self.v[0xF] = under_flag;
-            },
+            }
 
             // 8XY6: VX >>= 1
             (8, _, _, 6) => {
@@ -247,7 +253,7 @@ impl RustyChip {
                 let lsb = self.v[x] & 1;
                 self.v[x] >>= 1;
                 self.v[0xF] = lsb;
-            },
+            }
 
             // 8XY7: VX = VY - VX
             (8, _, _, 7) => {
@@ -255,11 +261,11 @@ impl RustyChip {
                 let y = hex3 as usize;
 
                 let (new_val, under) = self.v[y].overflowing_sub(self.v[x]);
-                let under_flag = if under {0} else {1};
+                let under_flag = if under { 0 } else { 1 };
 
                 self.v[x] = new_val;
                 self.v[0xF] = under_flag;
-            },
+            }
 
             // 8XYE: VX <<= 1
             (8, _, _, 0xE) => {
@@ -267,7 +273,7 @@ impl RustyChip {
                 let msb = (self.v[x] >> 7) & 1;
                 self.v[x] <<= 1;
                 self.v[0xF] = msb;
-            },
+            }
 
             // 9XY0: SKP if VX != VY
             (9, _, _, 0) => {
@@ -276,19 +282,19 @@ impl RustyChip {
                 if self.v[x] != self.v[y] {
                     self.pc += 2;
                 }
-            },
+            }
 
             // ANNN: I = NNN
             (0xA, _, _, _) => {
                 let nnn = op & 0xFFF;
                 self.i = nnn;
-            },
+            }
 
             // BNNN: JMP to V0 + NNN
             (0xB, _, _, _) => {
                 let nnn = op & 0xFFF;
                 self.pc += (self.v[0] as u16) + nnn;
-            },
+            }
 
             // CXNN: VX = rand() & NN
             (0xC, _, _, _) => {
@@ -296,7 +302,7 @@ impl RustyChip {
                 let nn = (op & 0xFF) as u8;
                 let rng: u8 = random();
                 self.v[x] = rng & nn;
-            },
+            }
 
             // DXYN: DRAW
             (0xD, _, _, _) => {
@@ -307,7 +313,7 @@ impl RustyChip {
 
                 let mut flipped: bool = false;
                 for y_line in 0..height {
-                    let addr = self.i + y_line as u16;
+                    let addr = self.i + y_line;
                     let pixels = self.memory[addr as usize];
 
                     for x_line in 0..8 {
@@ -326,7 +332,7 @@ impl RustyChip {
                 } else {
                     self.v[0xF] = 0;
                 }
-            },
+            }
 
             // EX9E: SKIP if key is pressed
             (0xE, _, 9, 0xE) => {
@@ -336,7 +342,7 @@ impl RustyChip {
                 if key {
                     self.pc += 2;
                 }
-            },
+            }
 
             // EXA1: SKIP if key not pressed
             (0xE, _, 0xA, 1) => {
@@ -346,13 +352,13 @@ impl RustyChip {
                 if !key {
                     self.pc += 2;
                 }
-            },
+            }
 
             // FX07: VX = DT
             (0xF, _, 0, 7) => {
                 let x = hex2 as usize;
                 self.v[x] = self.dt;
-            },
+            }
 
             // FX0A: Pause until key press
             (0xF, _, 0, 0xA) => {
@@ -369,33 +375,33 @@ impl RustyChip {
                 if !pressed {
                     self.pc -= 2;
                 }
-            },
+            }
 
             // FX15: DT = VX
             (0xF, _, 1, 5) => {
                 let x = hex2 as usize;
                 self.dt = self.v[x];
-            },
+            }
 
             // FX18: ST = VX
             (0xF, _, 1, 8) => {
                 let x = hex2 as usize;
                 self.st = self.v[x];
-            },
+            }
 
             // FX1E: I += VX
             (0xF, _, 1, 0xE) => {
                 let x = hex2 as usize;
                 let vx = self.v[x] as u16;
                 self.i = self.i.wrapping_add(vx);
-            },
+            }
 
             // FX29: I = font address
             (0xF, _, 2, 9) => {
                 let x = hex2 as usize;
                 let c = self.v[x] as u16;
                 self.i = c * 5;
-            },
+            }
 
             // FX33: I = BCD of VX
             (0xF, _, 3, 3) => {
@@ -409,7 +415,7 @@ impl RustyChip {
                 self.memory[self.i as usize] = hundreds;
                 self.memory[(self.i + 1) as usize] = tens;
                 self.memory[(self.i + 2) as usize] = ones;
-            },
+            }
 
             // FX55: I = V0 - VX
             (0xF, _, 5, 5) => {
@@ -418,7 +424,7 @@ impl RustyChip {
                 for idx in 0..=x {
                     self.memory[i + idx] = self.v[idx];
                 }
-            },
+            }
 
             // FX65: V0 - VX = I
             (0xF, _, 6, 5) => {
@@ -427,7 +433,7 @@ impl RustyChip {
                 for idx in 0..=x {
                     self.v[idx] = self.memory[i + idx];
                 }
-            },
+            }
 
             // Fallback for unimplemented
             (_, _, _, _) => unimplemented!("Unimplemented opcode: {}", op),

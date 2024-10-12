@@ -1,8 +1,8 @@
+use js_sys::Uint8Array;
 use rustychip_core::*;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement, KeyboardEvent};
-use js_sys::Uint8Array;
 
 #[wasm_bindgen]
 pub struct RustyChipWasm {
@@ -23,8 +23,10 @@ impl RustyChipWasm {
             .map_err(|_| ())
             .unwrap();
 
-        let ctx = canvas.get_context("2d")
-            .unwrap().unwrap()
+        let ctx = canvas
+            .get_context("2d")
+            .unwrap()
+            .unwrap()
             .dyn_into::<CanvasRenderingContext2d>()
             .unwrap();
 
@@ -63,15 +65,15 @@ impl RustyChipWasm {
     #[wasm_bindgen]
     pub fn draw(&mut self, scale: usize) {
         let disp = self.emulator.frontend_display();
-        for i in 0..(SCREEN_SIZE) {
-            if disp[i] {
+        for (i, pixel) in disp.iter().enumerate().take(SCREEN_SIZE) {
+            if *pixel {
                 let x = i % SCREEN_WIDTH;
                 let y = i / SCREEN_WIDTH;
                 self.ctx.fill_rect(
-                    (x * scale) as f64, 
-                    (y * scale) as f64, 
-                    scale as f64, 
-                    scale as f64
+                    (x * scale) as f64,
+                    (y * scale) as f64,
+                    scale as f64,
+                    scale as f64,
                 );
             }
         }

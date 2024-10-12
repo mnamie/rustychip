@@ -8,3 +8,4 @@ edition = "2021"
 [dependencies]
 rustychip_core = { path = "../rustychip_core" }
 sdl2 = "0.37.0"
+clap = { version = "4.5.20", features = ["derive"] }

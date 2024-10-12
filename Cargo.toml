@@ -4,3 +4,4 @@ members = [
     "rustychip_core",
     "wasm",
 ]
+resolver = "2"
