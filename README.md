@@ -2,6 +2,10 @@
 
 Following along with the [ebook from @aquova](https://github.com/aquova/chip8-book) to learn Rust with WASM.
 
+# Example
+
+Hosted version available at https://www.namie.me/projects/rustychip/chip8.html
+
 # Building WASM:
 
 1. Clone repository
