@@ -3,9 +3,11 @@
   "version": "1.0.0",
   "scripts": {
     "build": "tsc",
-    "watch": "tsc --watch"
+    "watch": "tsc --watch",
+    "format": "prettier --write 'web_frontend/**/*.ts'"
   },
   "devDependencies": {
+    "prettier": "^3.8.3",
     "typescript": "^5.0.0"
   }
 }

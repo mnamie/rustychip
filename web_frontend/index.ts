@@ -14,12 +14,14 @@ async function run() {
         emulator.system.keypress(evt, false);
     });
 
-    document.getElementById("clock-rate")!.addEventListener("input", function (evt: Event) {
-        const target = evt.target as HTMLInputElement;
-        const hz = parseFloat(target.value);
-        emulator.clockSpeed = (1.0 / hz) * 1000.0;
-        document.getElementById("clock-display")!.textContent = `${hz} HZ`;
-    });
+    document
+        .getElementById("clock-rate")!
+        .addEventListener("input", function (evt: Event) {
+            const target = evt.target as HTMLInputElement;
+            const hz = parseFloat(target.value);
+            emulator.clockSpeed = (1.0 / hz) * 1000.0;
+            document.getElementById("clock-display")!.textContent = `${hz} HZ`;
+        });
 
     async function loadRom(romName: string) {
         if (emulator.anim_frame !== 0) {
@@ -32,14 +34,18 @@ async function run() {
         requestAnimationFrame((time) => emulator.mainloop(time));
     }
 
-    document.getElementById("rom-grid")!.addEventListener("click", async function (evt: Event) {
-        const target = evt.target as HTMLElement;
-        const rom = target.dataset.rom;
-        if (!rom) return;
-        document.querySelectorAll(".rom-btn").forEach((btn) => btn.classList.remove("active"));
-        target.classList.add("active");
-        await loadRom(rom);
-    });
+    document
+        .getElementById("rom-grid")!
+        .addEventListener("click", async function (evt: Event) {
+            const target = evt.target as HTMLElement;
+            const rom = target.dataset.rom;
+            if (!rom) return;
+            document
+                .querySelectorAll(".rom-btn")
+                .forEach((btn) => btn.classList.remove("active"));
+            target.classList.add("active");
+            await loadRom(rom);
+        });
 }
 
 run().catch(console.error);
