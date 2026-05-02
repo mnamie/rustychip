@@ -1,3 +1,22 @@
-target
-wasm/pkg
-web_frontend/*wasm*
+# Rust
+target/
+
+# wasm-pack output
+wasm/pkg/
+
+# Generated files copied into web_frontend by wasm build
+web_frontend/*.js
+web_frontend/*.wasm
+web_frontend/*.d.ts
+
+# Compiled JS and WASM artifacts in public
+public/*.js
+public/*.wasm
+
+# npm
+node_modules/
+
+# TypeScript
+*.tsbuildinfo
+
+CLAUDE.md

@@ -4,53 +4,63 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RustyChip</title>
-    <link rel="stylesheet" href="static/style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="static/style.css">
 </head>
 <body>
-    <section class="flex-section">
-        <div>
-            <select name="rom" id="rom">
-                <option disabled selected>Select Game...</option>
-                <option value="INVADERS">Invaders</option>
-                <option value="CONNECT4">Connect 4</option>
-                <option value="LANDING">Landing</option>
-                <option value="MAZE">Maze</option>
-                <option value="PONG">Pong</option>
-                <option value="SPACE">Space</option>
-                <option value="TANK">Tank</option>
-                <option value="TETRIS">Tetris</option>
-                <option value="TICTACTOE">Tic Tac Toe</option>
-                <option value="WALL">Wall</option>
-                <option value="BLINKY">Blinky</option>
-                <option value="TEST_OPCODES">Test ROM</option>
-            </select>
+    <main class="cabinet">
+        <header class="cabinet-header">
+            <h1>RUSTYCHIP<span class="cursor">_</span></h1>
+            <p class="subtitle">CHIP-8 EMULATOR</p>
+        </header>
+
+        <div class="screen-wrap">
+            <canvas id="canvas" width="120" height="120"></canvas>
         </div>
-    </section>
 
-    <section class="flex-section">
-        <canvas width="120" height="120" id="canvas"></canvas>
-    </section>
-
-    <section class="flex-section">
-        <div>
-            <label>Clock Rate:</label>
-            <input id="clock-rate" type="number" min="1" value="20">Hz
+        <div class="controls-bar">
+            <span class="label">CLOCK</span>
+            <input id="clock-rate" type="range" min="1" max="500" value="20">
+            <span class="label" id="clock-display">20 HZ</span>
         </div>
-    </section>
-    
-    <section>
-        <h3>Controls</h3>
-        <p>1 | 2 | 3 | 4</p>
-        <p>Q | W | E | R</p>
-        <p>A | S | D | F</p>
-        <p>Z | X | C | V</p>
-    </section>
 
-    <section>
-        <p>Learn more about the <a href="https://en.wikipedia.org/wiki/CHIP-8">CHIP-8 VM</a></p>
-        <p>Source on <a href="https://github.com/mnamie/rustychip">GitHub</a></p>
-    </section>
-    
+        <section class="panel">
+            <h2 class="panel-title">SELECT GAME</h2>
+            <div class="game-grid" id="rom-grid">
+                <button class="rom-btn" data-rom="INVADERS">INVADERS</button>
+                <button class="rom-btn" data-rom="PONG">PONG</button>
+                <button class="rom-btn" data-rom="TETRIS">TETRIS</button>
+                <button class="rom-btn" data-rom="CONNECT4">CONNECT 4</button>
+                <button class="rom-btn" data-rom="MAZE">MAZE</button>
+                <button class="rom-btn" data-rom="SPACE">SPACE</button>
+                <button class="rom-btn" data-rom="TANK">TANK</button>
+                <button class="rom-btn" data-rom="LANDING">LANDING</button>
+                <button class="rom-btn" data-rom="BLINKY">BLINKY</button>
+                <button class="rom-btn" data-rom="TICTACTOE">TIC TAC TOE</button>
+                <button class="rom-btn" data-rom="WALL">WALL</button>
+                <button class="rom-btn" data-rom="TEST_OPCODES">TEST ROM</button>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2 class="panel-title">CONTROLS</h2>
+            <div class="key-grid">
+                <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd><kbd>4</kbd>
+                <kbd>Q</kbd><kbd>W</kbd><kbd>E</kbd><kbd>R</kbd>
+                <kbd>A</kbd><kbd>S</kbd><kbd>D</kbd><kbd>F</kbd>
+                <kbd>Z</kbd><kbd>X</kbd><kbd>C</kbd><kbd>V</kbd>
+            </div>
+        </section>
+
+        <footer class="cabinet-footer">
+            <a href="https://en.wikipedia.org/wiki/CHIP-8">CHIP-8</a>
+            <span>·</span>
+            <a href="https://github.com/mnamie/rustychip">GITHUB</a>
+        </footer>
+    </main>
+
     <script type="module" src="index.js"></script>
 </body>
 </html>
